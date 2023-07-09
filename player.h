@@ -1,15 +1,15 @@
 #pragma once
 
-#ifndef player.h
 #include "gameobject.h"
-#endif
 
 class Player : public GameObject
 {
 public:
     ~Player();
 
-    int speedX = 0;
+    double speedX = 0;
+    double maxAmmo = 1;
+    double ammo = maxAmmo;
 
     void Move();
     void Destroy();

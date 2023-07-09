@@ -22,7 +22,6 @@ int main(int argc, char* argv[])
     bullet.w = 64;
     bullet.h = 64;
     bullet.x = -100;
-    bullet.speedY = -2;
     bullet.Init(gWindow.renderer, "Src/Gfx/bullet.png");
 
     SDL_UpdateWindowSurface(gWindow.window);
@@ -47,8 +46,14 @@ int main(int argc, char* argv[])
                 player.speedX = 10;
                 break;
             case SDLK_UP:
-                bullet.x = player.x;
-                bullet.y = player.y;
+                if (player.ammo > 0)
+                {
+                    bullet.x = player.x + 4;
+                    bullet.y = player.y;
+                    bullet.speedY = -.25;
+
+                    player.ammo--;
+                }
                 break;
             default:
                 break;
@@ -60,7 +65,17 @@ int main(int argc, char* argv[])
 
         // Move the bullet
         bullet.Move();
-        bullet.Render(gWindow.renderer, bullet.x, bullet.y, bullet.w, bullet.h);
+        
+        // Only render the bullet if it's inside the window
+        if (bullet.y > (0 - bullet.h))
+        {
+            bullet.Render(gWindow.renderer, bullet.x, bullet.y, bullet.w, bullet.h);
+        }
+        else 
+        {
+            if (player.ammo < player.maxAmmo)
+                player.ammo++;
+        }
 
         // Move player
         player.Move();

@@ -10,7 +10,7 @@ void GameObject::Init(SDL_Renderer* renderer, string texturePath)
     }
 }
 
-void GameObject::Render(SDL_Renderer *renderer, int x, int y, int w, int h)
+void GameObject::Render(SDL_Renderer *renderer, double x, double y, double w, double h)
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 

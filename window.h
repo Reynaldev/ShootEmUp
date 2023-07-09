@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef window.h
 #include "main.h"
-#endif
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
