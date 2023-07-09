@@ -6,13 +6,12 @@
 
 int main(int argc, char* argv[])
 {
+    // Initialize gameplay
+    int level = 0;
+
     // Initialize window
     Window gWindow;
     gWindow.init();
-
-    // Initialize gameplay
-    int level = 1;
-    int enemyPerLevel = level * 2;
 
     // Initialize player
     Player player;
@@ -72,6 +71,12 @@ int main(int argc, char* argv[])
         // If there's no enemy, then we initialize them
         if (enemies.size() <= 0)
         {
+            level++;
+            int enemyPerLevel = level * 2;
+
+            cout << "Level: " << level << endl;
+            cout << "Enemies: " << enemyPerLevel << endl;
+
             for (int i = 0; i < enemyPerLevel; i++)
             {
                 Enemy enemy;
@@ -83,8 +88,6 @@ int main(int argc, char* argv[])
 
                 enemies.push_back(enemy);
             }
-
-            SDL_UpdateWindowSurface(gWindow.window);
         }
 
         // Render the window
@@ -93,9 +96,22 @@ int main(int argc, char* argv[])
         // Render enemies if there are
         if (enemies.size() > 0)
         {
+            // Render
             for (int i = 0; i < enemies.size(); i++)
             {
                 enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h);
+            }
+
+            // Detect collision
+            for (int i = 0; i < enemies.size(); i++)
+            {
+                // Destroy if it's collide with player's bullet and erase it from the vector
+                if (enemies[i].collideWith(bullet.rect))
+                {
+                    enemies[i].destroy();
+                    enemies.erase(enemies.begin() + i);
+                    cout << "Enemy destroyed." << endl;
+                }
             }
         }
 

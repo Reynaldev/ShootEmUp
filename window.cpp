@@ -34,7 +34,7 @@ void Window::init()
 
 void Window::render()
 {
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xff);
     SDL_RenderClear(renderer);
 }
 

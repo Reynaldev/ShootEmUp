@@ -14,7 +14,7 @@ void GameObject::render(SDL_Renderer *renderer, double x, double y, double w, do
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
-    SDL_Rect rect;
+    this->rect;
     rect.x = x;
     rect.y = y;
     rect.w = w;
@@ -24,13 +24,13 @@ void GameObject::render(SDL_Renderer *renderer, double x, double y, double w, do
     SDL_RenderCopy(renderer, this->texture, NULL, &rect);
 }
 
-bool GameObject::collideWith(GameObject other)
+bool GameObject::collideWith(SDL_Rect other)
 {
     // This object
-    double left = this->x;
-    double right = this->x + this->w;
-    double top = this->y;
-    double bottom = this->y + this->h;
+    double left = this->rect.x;
+    double right = this->rect.x + this->rect.w;
+    double top = this->rect.y;
+    double bottom = this->rect.y + this->rect.h;
 
     // Other object
     double otherLeft = other.x;
@@ -38,13 +38,25 @@ bool GameObject::collideWith(GameObject other)
     double otherTop = other.y;
     double otherBottom = other.y + other.h;
 
-    if (otherLeft <= right ||
-        otherRight >= left ||
-        otherTop <= bottom ||
-        otherBottom >= top)
+    if (left >= otherRight)
     {
-        return true;
+        return false;
     }
 
-    return false;
+    if (right <= otherLeft)
+    {
+        return false;
+    }
+
+    if (top >= otherBottom)
+    {
+        return false;
+    }
+
+    if (bottom <= otherTop)
+    {
+        return false;
+    }
+
+    return true;
 }
