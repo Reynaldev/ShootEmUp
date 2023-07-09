@@ -9,13 +9,13 @@ Player::~Player()
     this->speedX = NULL;
 }
 
-void Player::Move()
+void Player::move()
 {
     this->x += this->speedX;
     this->speedX = 0;
 }
 
-void Player::Destroy()
+void Player::destroy()
 {
     SDL_DestroyTexture(this->texture);
     this->~Player();

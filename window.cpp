@@ -1,6 +1,6 @@
 #include "window.h"
 
-void Window::Init()
+void Window::init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -32,16 +32,17 @@ void Window::Init()
     surface = SDL_GetWindowSurface(window);
 }
 
-void Window::Render()
+void Window::render()
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer);
 }
 
-void Window::Quit()
+void Window::quit()
 {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    SDL_FreeSurface(this->surface);
+    SDL_DestroyRenderer(this->renderer);
+    SDL_DestroyWindow(this->window);
 
     IMG_Quit();
     SDL_Quit();

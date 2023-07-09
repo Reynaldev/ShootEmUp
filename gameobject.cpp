@@ -1,6 +1,6 @@
 #include "gameobject.h"
 
-void GameObject::Init(SDL_Renderer* renderer, string texturePath)
+void GameObject::init(SDL_Renderer* renderer, string texturePath)
 {
     this->texture = IMG_LoadTexture(renderer, texturePath.c_str());
     if (!this->texture)
@@ -10,7 +10,7 @@ void GameObject::Init(SDL_Renderer* renderer, string texturePath)
     }
 }
 
-void GameObject::Render(SDL_Renderer *renderer, double x, double y, double w, double h)
+void GameObject::render(SDL_Renderer *renderer, double x, double y, double w, double h)
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
@@ -22,4 +22,29 @@ void GameObject::Render(SDL_Renderer *renderer, double x, double y, double w, do
     SDL_QueryTexture(this->texture, NULL, NULL, &rect.w, &rect.h);
 
     SDL_RenderCopy(renderer, this->texture, NULL, &rect);
+}
+
+bool GameObject::collideWith(GameObject other)
+{
+    // This object
+    double left = this->x;
+    double right = this->x + this->w;
+    double top = this->y;
+    double bottom = this->y + this->h;
+
+    // Other object
+    double otherLeft = other.x;
+    double otherRight = other.x + other.w;
+    double otherTop = other.y;
+    double otherBottom = other.y + other.h;
+
+    if (otherLeft <= right ||
+        otherRight >= left ||
+        otherTop <= bottom ||
+        otherBottom >= top)
+    {
+        return true;
+    }
+
+    return false;
 }

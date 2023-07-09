@@ -12,7 +12,7 @@ public:
     SDL_Renderer* renderer = NULL;
     SDL_Surface* surface = NULL;
 
-    void Init();
-    void Render();
-    void Quit();
+    void init();
+    void render();
+    void quit();
 };

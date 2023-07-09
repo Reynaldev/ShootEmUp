@@ -10,6 +10,8 @@ public:
 
     SDL_Texture *texture;
 
-    void Init(SDL_Renderer *renderer, string texturePath);
-    void Render(SDL_Renderer *renderer, double x, double y, double w, double h);
+    void init(SDL_Renderer *renderer, string texturePath);
+    void render(SDL_Renderer *renderer, double x, double y, double w, double h);
+
+    bool collideWith(GameObject other);
 };

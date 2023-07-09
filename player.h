@@ -11,6 +11,6 @@ public:
     double maxAmmo = 1;
     double ammo = maxAmmo;
 
-    void Move();
-    void Destroy();
+    void move();
+    void destroy();
 };

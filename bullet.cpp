@@ -9,12 +9,12 @@ Bullet::~Bullet()
     this->speedY = NULL;
 }
 
-void Bullet::Move()
+void Bullet::move()
 {
     this->y += this->speedY;
 }
 
-void Bullet::Destroy()
+void Bullet::destroy()
 {
     SDL_DestroyTexture(this->texture);
     this->~Bullet();

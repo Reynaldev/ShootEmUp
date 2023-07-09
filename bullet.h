@@ -9,6 +9,6 @@ public:
 
     double speedY = 0;
 
-    void Move();
-    void Destroy();
+    void move();
+    void destroy();
 };
