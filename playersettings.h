@@ -8,8 +8,9 @@ private:
     int health;
     int highscore; 
 public:
-    PlayerSettings(string playerName);
     ~PlayerSettings();
+
+    void createPlayer(string playerName);
 
     string getName();
 

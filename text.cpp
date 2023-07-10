@@ -1,5 +1,16 @@
 #include "text.h"
 
+Text::~Text()
+{
+    this->x = 0;
+    this->y = 0;
+    this->w = 0;
+    this->h = 0;
+
+    this->texture = NULL;
+    this->font = NULL;
+}
+
 void Text::create(int size, string path)
 {
     this->font = TTF_OpenFont(path.c_str(), size);
@@ -12,6 +23,10 @@ void Text::create(int size, string path)
 
 void Text::display(SDL_Renderer* renderer, SDL_Color color, string text)
 {
+    // Since we use the SDL_Texture defined in the Text class, 
+    // we have to destroy it everytime we want to render on it over and over to avoid memory leak
+    SDL_DestroyTexture(this->texture);
+
     SDL_Surface* surface = TTF_RenderText_Solid(this->font, text.c_str(), color);
     if (!surface)
     {
@@ -44,4 +59,5 @@ void Text::render(SDL_Renderer* renderer, double x, double y, SDL_Rect* clip, do
 void Text::destroy()
 {
     SDL_DestroyTexture(this->texture);
+    this->~Text();
 }

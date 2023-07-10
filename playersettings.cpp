@@ -1,18 +1,18 @@
 #include "playersettings.h"
 
-PlayerSettings::PlayerSettings(string playerName)
-{
-    this->name = name;
-    this->level = 0;
-    this->health = 3;
-    this->highscore = 0;
-}
-
 PlayerSettings::~PlayerSettings()
 {
     this->name = this->name.empty();
     this->level = 0;
     this->health = 0;
+    this->highscore = 0;
+}
+
+void PlayerSettings::createPlayer(string playerName)
+{
+    this->name = name;
+    this->level = 0;
+    this->health = 3;
     this->highscore = 0;
 }
 

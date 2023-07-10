@@ -9,7 +9,8 @@
 int main(int argc, char* argv[])
 {
     // Initialize player settings
-    PlayerSettings* player = new PlayerSettings("Dummy");
+    PlayerSettings player;
+    player.createPlayer("Dummy");
 
     // Initialize window
     Window gWindow;
@@ -88,21 +89,22 @@ int main(int argc, char* argv[])
         }
 
         // Update UI
-        levelText = "Level: " + to_string(player->getLevel());
+        // [Solved] These causes memory leak
+        levelText = "Level: " + to_string(player.getLevel());
         levelTextUI.display(gWindow.renderer, white, levelText);
 
-        higscoreText = "Highscore: " + to_string(player->getHighscore());
+        higscoreText = "Highscore: " + to_string(player.getHighscore());
         highscoreTextUI.display(gWindow.renderer, white, higscoreText);
 
-        healthText = "Health: " + to_string(player->getHealth());
+        healthText = "Health: " + to_string(player.getHealth());
         healthTextUI.display(gWindow.renderer, white, healthText);
 
         // Check if there are no enemies
         // If there's no enemy, then we initialize them
         if (enemies.size() <= 0)
         {
-            player->increaseLevel(1);
-            int enemyPerLevel = player->getLevel() * 2;
+            player.increaseLevel(1);
+            int enemyPerLevel = player.getLevel() * 2;
 
             // cout << "Level: " << level << endl;
             // cout << "Enemies: " << enemyPerLevel << endl;
@@ -141,7 +143,7 @@ int main(int argc, char* argv[])
                 {
                     enemies[i].destroy();
                     enemies.erase(enemies.begin() + i);
-                    player->increaseHighscore(1);
+                    player.increaseHighscore(1);
                 }
 
                 // Detect collision with player
@@ -187,7 +189,7 @@ int main(int argc, char* argv[])
     }
 
     // Clean-up
-    player->~PlayerSettings();
+    player.~PlayerSettings();
 
     levelTextUI.destroy();
     highscoreTextUI.destroy();
