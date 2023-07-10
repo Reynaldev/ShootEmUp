@@ -31,7 +31,15 @@ int main(int argc, char* argv[])
     bullet.x = -100;
     bullet.init(gWindow.renderer, "Src/Gfx/bullet.png");
 
-    // Initialize enemies
+    string enemyTextures[6];
+    enemyTextures[0] = "Src/Gfx/enemy1.png";
+    enemyTextures[1] = "Src/Gfx/enemy2.png";
+    enemyTextures[2] = "Src/Gfx/enemy3.png";
+    enemyTextures[3] = "Src/Gfx/enemy4.png";
+    enemyTextures[4] = "Src/Gfx/enemy5.png";
+    enemyTextures[5] = "Src/Gfx/enemy6.png";
+
+    // Vector that will be filled with total enemies each stage
     vector<Enemy> enemies;
 
     // Component
@@ -88,17 +96,6 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Update UI
-        // [Solved] These causes memory leak
-        levelText = "Level: " + to_string(player.getLevel());
-        levelTextUI.display(gWindow.renderer, white, levelText);
-
-        higscoreText = "Highscore: " + to_string(player.getHighscore());
-        highscoreTextUI.display(gWindow.renderer, white, higscoreText);
-
-        healthText = "Health: " + to_string(player.getHealth());
-        healthTextUI.display(gWindow.renderer, white, healthText);
-
         // Check if there are no enemies
         // If there's no enemy, then we initialize them
         if (enemies.size() <= 0)
@@ -114,10 +111,12 @@ int main(int argc, char* argv[])
                 Enemy enemy;
                 enemy.w = 64;
                 enemy.h = 64;
-                // enemy.x = (((SCREEN_WIDTH - enemy.w) / 2) + (enemy.w * i));
-                enemy.x = ((SCREEN_WIDTH - (enemy.w * enemyPerLevel)) / 2) + (enemy.w * i);
-                enemy.y = enemy.h;
-                enemy.init(gWindow.renderer, "Src/Gfx/enemy.png");
+                enemy.y = 0 - enemy.h;
+
+                enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
+                enemy.create(.2, abs(rand() % 10 - 6 + player.getLevel()));
+
+                cout << "Speed: " << enemy.speedY << endl;
 
                 enemies.push_back(enemy);
             }
@@ -132,21 +131,36 @@ int main(int argc, char* argv[])
             // Render
             for (int i = 0; i < enemies.size(); i++)
             {
-                enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h);
-            }
+                enemies[i].move();
 
-            // Detect collision
-            for (int i = 0; i < enemies.size(); i++)
-            {
+                if (enemies[i].y > SCREEN_HEIGHT)
+                {
+                    enemies[i].y = 0 - enemies[i].h;
+                    enemies[i].x = abs(rand() % SCREEN_WIDTH - enemies[i].w);
+                }
+
+                enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h);
+
                 // Destroy if it's collide with player's bullet and erase it from the vector
                 if (enemies[i].collideWith(bullet.rect))
                 {
                     enemies[i].destroy();
                     enemies.erase(enemies.begin() + i);
                     player.increaseHighscore(1);
+
+                    continue;
                 }
 
                 // Detect collision with player
+                if (enemies[i].collideWith(playerPlane.rect))
+                {
+                    player.setHealth(-1);
+
+                    enemies[i].destroy();
+                    enemies.erase(enemies.begin() + i);
+
+                    continue;
+                }
             }
         }
 
@@ -179,6 +193,17 @@ int main(int argc, char* argv[])
 
         // Render player
         playerPlane.render(gWindow.renderer, playerPlane.x, playerPlane.y, playerPlane.w, playerPlane.h);
+
+        // Update UI
+        // [Solved] These causes memory leak
+        levelText = "Level: " + to_string(player.getLevel());
+        levelTextUI.display(gWindow.renderer, white, levelText);
+
+        higscoreText = "Highscore: " + to_string(player.getHighscore());
+        highscoreTextUI.display(gWindow.renderer, white, higscoreText);
+
+        healthText = "Health: " + to_string(player.getHealth());
+        healthTextUI.display(gWindow.renderer, white, healthText);
 
         // Render UI
         levelTextUI.render(gWindow.renderer, 0, SCREEN_HEIGHT - levelTextUI.h);

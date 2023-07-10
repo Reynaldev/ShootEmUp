@@ -9,6 +9,8 @@ public:
     double maxAmmo = 1;
     double ammo = maxAmmo;
 
+    ~Player();
+
     void move();
     void destroy();
 };

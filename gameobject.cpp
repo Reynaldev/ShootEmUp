@@ -37,22 +37,11 @@ bool GameObject::collideWith(SDL_Rect other)
     double otherTop = other.y;
     double otherBottom = other.y + other.h;
 
-    if (left >= otherRight)
-    {
-        return false;
-    }
-
-    if (right <= otherLeft)
-    {
-        return false;
-    }
-
-    if (top >= otherBottom)
-    {
-        return false;
-    }
-
-    if (bottom <= otherTop)
+    // Check if other object is not collided
+    if (left >= otherRight ||
+        right <= otherLeft ||
+        top >= otherBottom ||
+        bottom <= otherTop)
     {
         return false;
     }

@@ -33,7 +33,7 @@ int PlayerSettings::getLevel()
 
 void PlayerSettings::setHealth(int amount)
 {
-    this->health = amount;
+    this->health += amount;
 }
 
 int PlayerSettings::getHealth()
