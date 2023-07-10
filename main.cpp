@@ -4,23 +4,24 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "text.h"
+#include "playersettings.h"
 
 int main(int argc, char* argv[])
 {
-    // Initialize gameplay
-    int level = 0;
+    // Initialize player settings
+    PlayerSettings* player = new PlayerSettings("Dummy");
 
     // Initialize window
     Window gWindow;
     gWindow.init();
 
     // Initialize player
-    Player player;
-    player.w = 64;
-    player.h = 64;
-    player.x = (SCREEN_WIDTH - player.w) / 2;
-    player.y = SCREEN_HEIGHT - player.h;
-    player.init(gWindow.renderer, "Src/Gfx/player.png");
+    Player playerPlane;
+    playerPlane.w = 64;
+    playerPlane.h = 64;
+    playerPlane.x = (SCREEN_WIDTH - playerPlane.w) / 2;
+    playerPlane.y = SCREEN_HEIGHT - playerPlane.h;
+    playerPlane.init(gWindow.renderer, "Src/Gfx/player.png");
 
     // Initialize bullets
     Bullet bullet;
@@ -36,19 +37,19 @@ int main(int argc, char* argv[])
     SDL_Color white = { 0xff, 0xff, 0xff, 0xff };
 
     // Level text
+    string levelText;
     Text levelTextUI;
     levelTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
-    levelTextUI.display(gWindow.renderer, white, "Level: 1");
 
     // Highscore text
+    string higscoreText;
     Text highscoreTextUI;
     highscoreTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
-    highscoreTextUI.display(gWindow.renderer, white, "Highscore: 0");
 
     // Health text
+    string healthText;
     Text healthTextUI;
     healthTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
-    healthTextUI.display(gWindow.renderer, white, "Health: 0");
 
     SDL_UpdateWindowSurface(gWindow.window);
 
@@ -66,19 +67,19 @@ int main(int argc, char* argv[])
             switch (e.key.keysym.sym)
             {
             case SDLK_LEFT:
-                player.speedX = -10;
+                playerPlane.speedX = -10;
                 break;
             case SDLK_RIGHT:
-                player.speedX = 10;
+                playerPlane.speedX = 10;
                 break;
             case SDLK_UP:
-                if (player.ammo > 0)
+                if (playerPlane.ammo > 0)
                 {
-                    bullet.x = player.x + sqrt(bullet.w);
-                    bullet.y = player.y;
+                    bullet.x = playerPlane.x + sqrt(bullet.w);
+                    bullet.y = playerPlane.y;
                     bullet.speedY = -.25;
 
-                    player.ammo--;
+                    playerPlane.ammo--;
                 }
                 break;
             default:
@@ -86,12 +87,22 @@ int main(int argc, char* argv[])
             }
         }
 
+        // Update UI
+        levelText = "Level: " + to_string(player->getLevel());
+        levelTextUI.display(gWindow.renderer, white, levelText);
+
+        higscoreText = "Highscore: " + to_string(player->getHighscore());
+        highscoreTextUI.display(gWindow.renderer, white, higscoreText);
+
+        healthText = "Health: " + to_string(player->getHealth());
+        healthTextUI.display(gWindow.renderer, white, healthText);
+
         // Check if there are no enemies
         // If there's no enemy, then we initialize them
         if (enemies.size() <= 0)
         {
-            level++;
-            int enemyPerLevel = level * 2;
+            player->increaseLevel(1);
+            int enemyPerLevel = player->getLevel() * 2;
 
             // cout << "Level: " << level << endl;
             // cout << "Enemies: " << enemyPerLevel << endl;
@@ -130,8 +141,10 @@ int main(int argc, char* argv[])
                 {
                     enemies[i].destroy();
                     enemies.erase(enemies.begin() + i);
-                    // cout << "Enemy destroyed." << endl;
+                    player->increaseHighscore(1);
                 }
+
+                // Detect collision with player
             }
         }
 
@@ -145,26 +158,27 @@ int main(int argc, char* argv[])
         }
         else 
         {
-            if (player.ammo < player.maxAmmo)
-                player.ammo++;
+            if (playerPlane.ammo < playerPlane.maxAmmo)
+                playerPlane.ammo++;
         }
 
         // Move player
-        player.move();
+        playerPlane.move();
 
         // Render the player and check if it's out of the window's width
-        if (player.x > SCREEN_WIDTH)
+        if (playerPlane.x > SCREEN_WIDTH)
         {
-            player.x = 0 - player.w;
+            playerPlane.x = 0 - playerPlane.w;
         }
-        else if (player.x < 0 - player.w)
+        else if (playerPlane.x < 0 - playerPlane.w)
         {
-            player.x = SCREEN_WIDTH;
+            playerPlane.x = SCREEN_WIDTH;
         }
 
-        player.render(gWindow.renderer, player.x, player.y, player.w, player.h);
+        // Render player
+        playerPlane.render(gWindow.renderer, playerPlane.x, playerPlane.y, playerPlane.w, playerPlane.h);
 
-        // UI
+        // Render UI
         levelTextUI.render(gWindow.renderer, 0, SCREEN_HEIGHT - levelTextUI.h);
         highscoreTextUI.render(gWindow.renderer, (SCREEN_WIDTH - highscoreTextUI.w) / 2, SCREEN_HEIGHT - highscoreTextUI.h);
         healthTextUI.render(gWindow.renderer, SCREEN_WIDTH - healthTextUI.w, SCREEN_HEIGHT - healthTextUI.h);
@@ -173,6 +187,8 @@ int main(int argc, char* argv[])
     }
 
     // Clean-up
+    player->~PlayerSettings();
+
     levelTextUI.destroy();
     highscoreTextUI.destroy();
     healthTextUI.destroy();
@@ -183,7 +199,7 @@ int main(int argc, char* argv[])
     }
 
     bullet.destroy();
-    player.destroy();
+    playerPlane.destroy();
 
     gWindow.quit();
 
