@@ -3,6 +3,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "text.h"
 
 int main(int argc, char* argv[])
 {
@@ -31,6 +32,24 @@ int main(int argc, char* argv[])
     // Initialize enemies
     vector<Enemy> enemies;
 
+    // Component
+    SDL_Color white = { 0xff, 0xff, 0xff, 0xff };
+
+    // Level text
+    Text levelTextUI;
+    levelTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    levelTextUI.display(gWindow.renderer, white, "Level: 1");
+
+    // Highscore text
+    Text highscoreTextUI;
+    highscoreTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    highscoreTextUI.display(gWindow.renderer, white, "Highscore: 0");
+
+    // Health text
+    Text healthTextUI;
+    healthTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    healthTextUI.display(gWindow.renderer, white, "Health: 0");
+
     SDL_UpdateWindowSurface(gWindow.window);
 
     // Loop
@@ -55,7 +74,7 @@ int main(int argc, char* argv[])
             case SDLK_UP:
                 if (player.ammo > 0)
                 {
-                    bullet.x = player.x + 5;
+                    bullet.x = player.x + sqrt(bullet.w);
                     bullet.y = player.y;
                     bullet.speedY = -.25;
 
@@ -74,16 +93,17 @@ int main(int argc, char* argv[])
             level++;
             int enemyPerLevel = level * 2;
 
-            cout << "Level: " << level << endl;
-            cout << "Enemies: " << enemyPerLevel << endl;
+            // cout << "Level: " << level << endl;
+            // cout << "Enemies: " << enemyPerLevel << endl;
 
             for (int i = 0; i < enemyPerLevel; i++)
             {
                 Enemy enemy;
                 enemy.w = 64;
                 enemy.h = 64;
-                enemy.x = (((SCREEN_WIDTH - enemy.w) / 2) + ((player.w / 2) * i));
-                enemy.y = player.h;
+                // enemy.x = (((SCREEN_WIDTH - enemy.w) / 2) + (enemy.w * i));
+                enemy.x = ((SCREEN_WIDTH - (enemy.w * enemyPerLevel)) / 2) + (enemy.w * i);
+                enemy.y = enemy.h;
                 enemy.init(gWindow.renderer, "Src/Gfx/enemy.png");
 
                 enemies.push_back(enemy);
@@ -110,7 +130,7 @@ int main(int argc, char* argv[])
                 {
                     enemies[i].destroy();
                     enemies.erase(enemies.begin() + i);
-                    cout << "Enemy destroyed." << endl;
+                    // cout << "Enemy destroyed." << endl;
                 }
             }
         }
@@ -144,8 +164,18 @@ int main(int argc, char* argv[])
 
         player.render(gWindow.renderer, player.x, player.y, player.w, player.h);
 
+        // UI
+        levelTextUI.render(gWindow.renderer, 0, SCREEN_HEIGHT - levelTextUI.h);
+        highscoreTextUI.render(gWindow.renderer, (SCREEN_WIDTH - highscoreTextUI.w) / 2, SCREEN_HEIGHT - highscoreTextUI.h);
+        healthTextUI.render(gWindow.renderer, SCREEN_WIDTH - healthTextUI.w, SCREEN_HEIGHT - healthTextUI.h);
+
         SDL_RenderPresent(gWindow.renderer);
     }
+
+    // Clean-up
+    levelTextUI.destroy();
+    highscoreTextUI.destroy();
+    healthTextUI.destroy();
 
     for (int i = 0; i < enemies.size(); i++)
     {
@@ -154,6 +184,7 @@ int main(int argc, char* argv[])
 
     bullet.destroy();
     player.destroy();
+
     gWindow.quit();
 
     return 0;

@@ -1,14 +1,5 @@
 #include "player.h"
 
-Player::~Player()
-{
-    this->x = NULL;
-    this->y = NULL;
-    this->w = NULL;
-    this->h = NULL;
-    this->speedX = NULL;
-}
-
 void Player::move()
 {
     this->x += this->speedX;
@@ -18,5 +9,4 @@ void Player::move()
 void Player::destroy()
 {
     SDL_DestroyTexture(this->texture);
-    this->~Player();
 }

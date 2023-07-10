@@ -5,8 +5,6 @@
 class Bullet : public GameObject
 {
 public:
-    ~Bullet();
-
     double speedY = 0;
 
     void move();

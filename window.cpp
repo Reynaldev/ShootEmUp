@@ -1,5 +1,12 @@
 #include "window.h"
 
+Window::~Window()
+{
+    this->window = NULL;
+    this->renderer = NULL;
+    this->surface = NULL;
+}
+
 void Window::init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -29,6 +36,12 @@ void Window::init()
         exit(1);
     }
 
+    if (TTF_Init() == -1)
+    {
+        cout << "SDL_ttf could not be initialized!\nError: " << TTF_GetError() << endl;
+        exit(1);
+    }
+
     surface = SDL_GetWindowSurface(window);
 }
 
@@ -45,5 +58,8 @@ void Window::quit()
     SDL_DestroyWindow(this->window);
 
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
+
+    this->~Window();
 }

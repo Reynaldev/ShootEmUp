@@ -14,14 +14,13 @@ void GameObject::render(SDL_Renderer *renderer, double x, double y, double w, do
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
-    this->rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
-    SDL_QueryTexture(this->texture, NULL, NULL, &rect.w, &rect.h);
+    this->rect.x = x;
+    this->rect.y = y;
+    this->rect.w = w;
+    this->rect.h = h;
+    SDL_QueryTexture(this->texture, NULL, NULL, &this->rect.w, &this->rect.h);
 
-    SDL_RenderCopy(renderer, this->texture, NULL, &rect);
+    SDL_RenderCopy(renderer, this->texture, NULL, &this->rect);
 }
 
 bool GameObject::collideWith(SDL_Rect other)

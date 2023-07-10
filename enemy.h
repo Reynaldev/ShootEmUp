@@ -5,7 +5,5 @@
 class Enemy : public GameObject
 {
 public:
-    ~Enemy();
-
     void destroy();
 };
