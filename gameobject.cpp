@@ -48,3 +48,13 @@ bool GameObject::collideWith(SDL_Rect other)
 
     return true;
 }
+
+void GameObject::setActive(bool isActive)
+{
+    this->enabled = isActive;
+}
+
+bool GameObject::isActive()
+{
+    return this->enabled;
+}

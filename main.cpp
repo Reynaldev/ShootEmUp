@@ -9,10 +9,14 @@
 
 int main(int argc, char* argv[])
 {
+    // Set seed for RNG
+    srand(time(NULL));
+
     // Initialize player settings
     PlayerSettings player;
     player.createPlayer("Dummy");
 
+    // Initialize timer
     Timer timer;
 
     // Initialize window
@@ -89,14 +93,12 @@ int main(int argc, char* argv[])
             player.increaseLevel(1);
             int enemyPerLevel = player.getLevel() * 2;
 
-            // cout << "Level: " << level << endl;
-            // cout << "Enemies: " << enemyPerLevel << endl;
-
             for (int i = 0; i < enemyPerLevel; i++)
             {
                 Enemy enemy;
                 enemy.w = 64;
                 enemy.h = 64;
+                enemy.x = abs(rand() % SCREEN_WIDTH - enemy.w);
                 enemy.y = 0 - enemy.h;
 
                 enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
@@ -127,7 +129,7 @@ int main(int argc, char* argv[])
                 enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h, NULL, 180, NULL);
 
                 // Destroy if it's collide with player's bullet and erase it from the vector
-                if (enemies[i].collideWith(bullet.rect))
+                if (enemies[i].collideWith(bullet.rect) && bullet.isActive())
                 {
                     enemies[i].destroy();
                     enemies.erase(enemies.begin() + i);
@@ -137,7 +139,7 @@ int main(int argc, char* argv[])
                 }
 
                 // Detect collision with player
-                if (enemies[i].collideWith(playerPlane.rect))
+                if (enemies[i].collideWith(playerPlane.rect) && playerPlane.isActive())
                 {
                     player.setHealth(-1);
 
@@ -159,8 +161,10 @@ int main(int argc, char* argv[])
         }
         else 
         {
-            bullet.x = -100;
+            // Disable  the bullet
+            bullet.setActive(false);
 
+            // Increase the ammo if it's less than the maximum ammo
             if (playerPlane.ammo < playerPlane.maxAmmo)
                 playerPlane.ammo++;
         }

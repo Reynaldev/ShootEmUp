@@ -57,7 +57,9 @@ void Player::shoot(Bullet& bullet)
     {
         if (this->ammo <= 0)
             return;
-        
+
+        bullet.setActive(true);
+
         bullet.x = this->x + sqrt(bullet.w);
         bullet.y = this->y;
 
