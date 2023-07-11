@@ -12,15 +12,15 @@ Enemy::~Enemy()
     this->texture = NULL;
 }
 
-void Enemy::create(double speed, int health)
+void Enemy::create(float speed, int health)
 {
     this->speedY = speed;
     this->health = health;
 }
 
-void Enemy::move()
+void Enemy::move(float timeStep)
 {
-    this->y += speedY;
+    this->y += speedY * timeStep;
 }
 
 void Enemy::destroy()

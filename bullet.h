@@ -5,10 +5,10 @@
 class Bullet : public GameObject
 {
 public:
-    double speedY = 0;
+    float speedY = 0;
 
     ~Bullet();
 
-    void move();
+    void move(float timeStep);
     void destroy();
 };

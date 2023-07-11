@@ -11,9 +11,9 @@ Bullet::~Bullet()
     this->texture = NULL;
 }
 
-void Bullet::move()
+void Bullet::move(float timeStep)
 {
-    this->y += this->speedY;
+    this->y += this->speedY * timeStep;
 }
 
 void Bullet::destroy()

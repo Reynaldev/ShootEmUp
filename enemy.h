@@ -7,12 +7,12 @@
 class Enemy : public GameObject
 {
 public:
-    double speedY = 0;
+    float speedY = 0;
     int health = 0;
 
     ~Enemy();
 
-    void create(double speed, int health);
-    void move();
+    void create(float speed, int health);
+    void move(float timeStep);
     void destroy();
 };

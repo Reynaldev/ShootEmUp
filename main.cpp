@@ -5,12 +5,15 @@
 #include "enemy.h"
 #include "text.h"
 #include "playersettings.h"
+#include "timer.h"
 
 int main(int argc, char* argv[])
 {
     // Initialize player settings
     PlayerSettings player;
     player.createPlayer("Dummy");
+
+    Timer timer;
 
     // Initialize window
     Window gWindow;
@@ -29,6 +32,7 @@ int main(int argc, char* argv[])
     bullet.w = 64;
     bullet.h = 64;
     bullet.x = -100;
+    bullet.speedY = -500.0f;
     bullet.init(gWindow.renderer, "Src/Gfx/bullet.png");
 
     string enemyTextures[6];
@@ -72,29 +76,11 @@ int main(int argc, char* argv[])
             if (e.type == SDL_QUIT)
                 quit = true;
 
-            // Input
-            switch (e.key.keysym.sym)
-            {
-            case SDLK_LEFT:
-                playerPlane.speedX = -10;
-                break;
-            case SDLK_RIGHT:
-                playerPlane.speedX = 10;
-                break;
-            case SDLK_UP:
-                if (playerPlane.ammo > 0)
-                {
-                    bullet.x = playerPlane.x + sqrt(bullet.w);
-                    bullet.y = playerPlane.y;
-                    bullet.speedY = -.25;
-
-                    playerPlane.ammo--;
-                }
-                break;
-            default:
-                break;
-            }
+            playerPlane.input(e);
         }
+
+        // Calculate timestep
+        float timeStep = timer.getTicks() / 1000.0f;
 
         // Check if there are no enemies
         // If there's no enemy, then we initialize them
@@ -114,9 +100,7 @@ int main(int argc, char* argv[])
                 enemy.y = 0 - enemy.h;
 
                 enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
-                enemy.create(.2, abs(rand() % 10 - 6 + player.getLevel()));
-
-                cout << "Speed: " << enemy.speedY << endl;
+                enemy.create(100.0f + float(rand() % 201), abs(rand() % 10 - 6 + player.getLevel()));
 
                 enemies.push_back(enemy);
             }
@@ -131,15 +115,16 @@ int main(int argc, char* argv[])
             // Render
             for (int i = 0; i < enemies.size(); i++)
             {
-                enemies[i].move();
+                enemies[i].move(timeStep);
 
                 if (enemies[i].y > SCREEN_HEIGHT)
                 {
                     enemies[i].y = 0 - enemies[i].h;
                     enemies[i].x = abs(rand() % SCREEN_WIDTH - enemies[i].w);
+                    enemies[i].speedY = 100.0f + float(rand() % 201);
                 }
 
-                enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h);
+                enemies[i].render(gWindow.renderer, enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h, NULL, 180, NULL);
 
                 // Destroy if it's collide with player's bullet and erase it from the vector
                 if (enemies[i].collideWith(bullet.rect))
@@ -165,7 +150,7 @@ int main(int argc, char* argv[])
         }
 
         // Move the bullet
-        bullet.move();
+        bullet.move(timeStep);
         
         // Only render the bullet if it's inside the window
         if (bullet.y > (0 - bullet.h))
@@ -174,12 +159,18 @@ int main(int argc, char* argv[])
         }
         else 
         {
+            bullet.x = -100;
+
             if (playerPlane.ammo < playerPlane.maxAmmo)
                 playerPlane.ammo++;
         }
 
         // Move player
-        playerPlane.move();
+        playerPlane.move(timeStep);
+        playerPlane.shoot(bullet);
+
+        // Restart timer
+        timer.start();
 
         // Render the player and check if it's out of the window's width
         if (playerPlane.x > SCREEN_WIDTH)
