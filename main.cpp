@@ -30,12 +30,10 @@ int main(int argc, char* argv[])
     playerPlane.h = 64;
     playerPlane.x = (SCREEN_WIDTH - playerPlane.w) / 2;
     playerPlane.y = SCREEN_HEIGHT - playerPlane.h;
-    playerPlane.maxAmmo = 10;
-    playerPlane.firespeed = 200.0f;
+    playerPlane.create(2, 10.0f);
     playerPlane.init(gWindow.renderer, "Src/Gfx/player.png");
 
-    // Initialize bullets
-
+    // Initialize enemy textures
     string enemyTextures[6];
     for (int i = 0; i < 6; i++)
     {
@@ -47,6 +45,17 @@ int main(int argc, char* argv[])
     // Initialize bullets
     // bulletPool is to store bullet object for pooling.
     vector<Bullet> bulletPool;
+    while (bulletPool.size() < playerPlane.maxAmmo)
+    {
+        Bullet bullet;
+        bullet.w = 64;
+        bullet.h = 64;
+        bullet.speedY = -600.0f;
+        bullet.init(gWindow.renderer, "Src/Gfx/bullet.png");
+
+        bulletPool.push_back(bullet);
+    }
+
     // bullets is to store bullet object for render and logic purpose.
     vector<Bullet> bullets;
 
@@ -74,6 +83,14 @@ int main(int argc, char* argv[])
     Text healthTextUI;
     healthTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
 
+    string ammoText;
+    Text ammoTextUI;
+    ammoTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    
+    string maxAmmoText;
+    Text maxAmmoTextUI;
+    maxAmmoTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+
     SDL_UpdateWindowSurface(gWindow.window);
 
     // Loop
@@ -95,19 +112,24 @@ int main(int argc, char* argv[])
         // Render the window
         gWindow.render();
 
-        // Bullets 
-        // If bullets vector is less than max ammo, we'll add it
-        while (bulletPool.size() < playerPlane.maxAmmo)
+        // Care Package
+        if (carePackages.size() > 0)
         {
-            Bullet bullet;
-            bullet.w = 64;
-            bullet.h = 64;
-            bullet.speedY = -600.0f;
-            bullet.init(gWindow.renderer, "Src/Gfx/bullet.png");
+            for (int i = 0; i < carePackages.size(); i++)
+            {
+                carePackages[i].move(timeStep);
+                carePackages[i].render(gWindow.renderer);
 
-            bulletPool.push_back(bullet);
+                // Destroy the package if it's outside the window
+                if (carePackages[i].y > SCREEN_WIDTH)
+                {
+                    carePackages[i].destroy();
+                    carePackages.erase(carePackages.begin() + i);
+                }
+            }
         }
 
+        // Bullets
         // Bullet render, logic, etc.
         if (bullets.size() > 0)
         {
@@ -183,7 +205,7 @@ int main(int argc, char* argv[])
                         enemies.erase(enemies.begin() + i);
                         player.increaseHighscore(1);
 
-                        continue;
+                        break;
                     }
                 }
 
@@ -200,30 +222,13 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Care Package
-        if (carePackages.size() > 0)
-        {
-            for (int i = 0; i < carePackages.size(); i++)
-            {
-                carePackages[i].move(timeStep);
-                carePackages[i].render(gWindow.renderer);
-
-                // Destroy the package if it's outside the window
-                if (carePackages[i].y > SCREEN_WIDTH)
-                {
-                    carePackages[i].destroy();
-                    carePackages.erase(carePackages.begin() + i);
-                }
-            }
-        }
-
         // Move player
         playerPlane.move(timeStep);
         
         if (SDL_GetTicks() >= playerPlane.nextFirespeed)
         {
             playerPlane.shoot(bulletPool, bullets);
-            playerPlane.nextFirespeed = SDL_GetTicks() / 1000.0f + playerPlane.firespeed;
+            playerPlane.nextFirespeed = SDL_GetTicks() + 1000.0f / playerPlane.firespeed;
         }
 
         // Restart timer
@@ -255,10 +260,18 @@ int main(int argc, char* argv[])
         healthText = "Health: " + to_string(player.getHealth());
         healthTextUI.display(gWindow.renderer, white, healthText);
 
+        ammoText = "Ammo: " + to_string(playerPlane.ammo);
+        ammoTextUI.display(gWindow.renderer, white, ammoText);
+
+        maxAmmoText = "Max Ammo: " + to_string(playerPlane.maxAmmo);
+        maxAmmoTextUI.display(gWindow.renderer, white, maxAmmoText);
+
         // Render UI
         levelTextUI.render(gWindow.renderer, 0, SCREEN_HEIGHT - levelTextUI.h);
         highscoreTextUI.render(gWindow.renderer, (SCREEN_WIDTH - highscoreTextUI.w) / 2, SCREEN_HEIGHT - highscoreTextUI.h);
         healthTextUI.render(gWindow.renderer, SCREEN_WIDTH - healthTextUI.w, SCREEN_HEIGHT - healthTextUI.h);
+        ammoTextUI.render(gWindow.renderer, 0, 0);
+        maxAmmoTextUI.render(gWindow.renderer, SCREEN_WIDTH - maxAmmoTextUI.w, 0);
 
         SDL_RenderPresent(gWindow.renderer);
     }
@@ -271,10 +284,18 @@ int main(int argc, char* argv[])
     levelTextUI.destroy();
     highscoreTextUI.destroy();
     healthTextUI.destroy();
+    ammoTextUI.destroy();
+    maxAmmoTextUI.destroy();
 
     for (int i = 0; i < enemies.size(); i++)
     {
         enemies[i].destroy();
+    }
+    enemies.clear();
+
+    for (int i = 0; i < bulletPool.size(); i++)
+    {
+        bulletPool[i].destroy();
     }
 
     for (int i = 0; i < bullets.size(); i++)

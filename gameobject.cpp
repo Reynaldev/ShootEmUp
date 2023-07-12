@@ -12,6 +12,9 @@ void GameObject::init(SDL_Renderer* renderer, string texturePath)
 
 void GameObject::render(SDL_Renderer* renderer, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
+    if (!this->isActive())
+        return;
+
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
     this->rect.x = this->x;

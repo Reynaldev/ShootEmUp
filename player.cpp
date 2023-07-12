@@ -7,11 +7,21 @@ Player::~Player()
     this->w = 0;
     this->h = 0;
     this->speedX = 0;
+    this->firespeed = 0;
+    this->nextFirespeed = 0;
     this->maxAmmo = 0;
     this->ammo = 0;
     this->setActive(false);
     
     this->texture = NULL;
+}
+
+void Player::create(int maxAmmo, float firespeed)
+{
+    this->maxAmmo = maxAmmo;
+    this->ammo = this->maxAmmo;
+
+    this->firespeed = firespeed;
 }
 
 void Player::input(SDL_Event& e)

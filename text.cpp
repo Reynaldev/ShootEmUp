@@ -47,7 +47,7 @@ void Text::display(SDL_Renderer* renderer, SDL_Color color, string text)
     SDL_FreeSurface(surface);
 }
 
-void Text::render(SDL_Renderer* renderer, double x, double y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Text::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
     this->rect.x = x;
     this->rect.y = y;
