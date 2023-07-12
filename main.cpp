@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     playerPlane.h = 64;
     playerPlane.x = (SCREEN_WIDTH - playerPlane.w) / 2;
     playerPlane.y = SCREEN_HEIGHT - playerPlane.h;
-    playerPlane.create(2, 10.0f);
+    playerPlane.create(1, 5.0f);
     playerPlane.init(gWindow.renderer, "Src/Gfx/player.png");
 
     // Initialize enemy textures
@@ -87,9 +87,9 @@ int main(int argc, char* argv[])
     Text ammoTextUI;
     ammoTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
     
-    string maxAmmoText;
-    Text maxAmmoTextUI;
-    maxAmmoTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    string enemiesText;
+    Text enemiesTextUI;
+    enemiesTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
 
     SDL_UpdateWindowSurface(gWindow.window);
 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
                 Enemy enemy;
                 enemy.w = 64;
                 enemy.h = 64;
-                enemy.x = abs(rand() % SCREEN_WIDTH - enemy.w);
+                enemy.x = abs((float)(rand() % SCREEN_WIDTH) - enemy.w);
                 enemy.y = 0 - enemy.h;
 
                 enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
@@ -260,18 +260,18 @@ int main(int argc, char* argv[])
         healthText = "Health: " + to_string(player.getHealth());
         healthTextUI.display(gWindow.renderer, white, healthText);
 
-        ammoText = "Ammo: " + to_string(playerPlane.ammo);
+        ammoText = "Ammo: " + to_string(playerPlane.ammo) + " | " + to_string(playerPlane.maxAmmo);
         ammoTextUI.display(gWindow.renderer, white, ammoText);
 
-        maxAmmoText = "Max Ammo: " + to_string(playerPlane.maxAmmo);
-        maxAmmoTextUI.display(gWindow.renderer, white, maxAmmoText);
+        enemiesText = "Enemies left: " + to_string(enemies.size());
+        enemiesTextUI.display(gWindow.renderer, white, enemiesText);
 
         // Render UI
         levelTextUI.render(gWindow.renderer, 0, SCREEN_HEIGHT - levelTextUI.h);
         highscoreTextUI.render(gWindow.renderer, (SCREEN_WIDTH - highscoreTextUI.w) / 2, SCREEN_HEIGHT - highscoreTextUI.h);
         healthTextUI.render(gWindow.renderer, SCREEN_WIDTH - healthTextUI.w, SCREEN_HEIGHT - healthTextUI.h);
         ammoTextUI.render(gWindow.renderer, 0, 0);
-        maxAmmoTextUI.render(gWindow.renderer, SCREEN_WIDTH - maxAmmoTextUI.w, 0);
+        enemiesTextUI.render(gWindow.renderer, SCREEN_WIDTH - enemiesTextUI.w, 0);
 
         SDL_RenderPresent(gWindow.renderer);
     }
@@ -285,7 +285,7 @@ int main(int argc, char* argv[])
     highscoreTextUI.destroy();
     healthTextUI.destroy();
     ammoTextUI.destroy();
-    maxAmmoTextUI.destroy();
+    enemiesTextUI.destroy();
 
     for (int i = 0; i < enemies.size(); i++)
     {
@@ -297,11 +297,13 @@ int main(int argc, char* argv[])
     {
         bulletPool[i].destroy();
     }
+    bulletPool.clear();
 
     for (int i = 0; i < bullets.size(); i++)
     {
         bullets[i].destroy();
     }
+    bullets.clear();
     
     playerPlane.destroy();
 
