@@ -10,14 +10,14 @@ void GameObject::init(SDL_Renderer* renderer, string texturePath)
     }
 }
 
-void GameObject::render(SDL_Renderer* renderer, float x, float y, float w, float h, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void GameObject::render(SDL_Renderer* renderer, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
-    this->rect.x = x;
-    this->rect.y = y;
-    this->rect.w = w;
-    this->rect.h = h;
+    this->rect.x = this->x;
+    this->rect.y = this->y;
+    this->rect.w = this->w;
+    this->rect.h = this->h;
     SDL_QueryTexture(this->texture, NULL, NULL, &this->rect.w, &this->rect.h);
 
     SDL_RenderCopyEx(renderer, this->texture, clip, &this->rect, angle, center, flip);

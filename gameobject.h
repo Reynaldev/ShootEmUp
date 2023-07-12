@@ -14,7 +14,7 @@ public:
     SDL_Rect rect;
 
     void init(SDL_Renderer *renderer, string texturePath);
-    void render(SDL_Renderer* renderer, float x, float y, float w, float h, SDL_Rect* clip = NULL, double angle = 0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void render(SDL_Renderer* renderer, SDL_Rect* clip = NULL, double angle = 0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
     
     bool collideWith(SDL_Rect other);
 

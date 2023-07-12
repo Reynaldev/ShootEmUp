@@ -6,9 +6,10 @@
 
 class Enemy : public GameObject
 {
+private:
+    int health = 0;
 public:
     float speedY = 0;
-    int health = 0;
 
     ~Enemy();
 

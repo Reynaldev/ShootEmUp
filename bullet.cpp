@@ -7,6 +7,7 @@ Bullet::~Bullet()
     this->w = 0;
     this->h = 0;
     this->speedY = 0;
+    this->setActive(false);
     
     this->texture = NULL;
 }
