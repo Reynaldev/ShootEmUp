@@ -2,6 +2,8 @@
 
 #include "main.h"
 #include "gameobject.h"
+#include "player.h"
+#include "playersettings.h"
 
 enum PackageType 
 {
@@ -18,7 +20,8 @@ private:
 public:
     ~CarePackage();
 
-    void create(PackageType type);
+    void create(SDL_Renderer* renderer, PackageType type);
     void move(float timeStep);
+    void get(Player &player);
     void destroy();
 };

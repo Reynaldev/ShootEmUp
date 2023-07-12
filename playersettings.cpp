@@ -4,7 +4,6 @@ PlayerSettings::~PlayerSettings()
 {
     this->name = this->name.empty();
     this->level = 0;
-    this->health = 0;
     this->highscore = 0;
 }
 
@@ -12,7 +11,6 @@ void PlayerSettings::createPlayer(string playerName)
 {
     this->name = name;
     this->level = 0;
-    this->health = 3;
     this->highscore = 0;
 }
 
@@ -29,16 +27,6 @@ void PlayerSettings::increaseLevel(int amount)
 int PlayerSettings::getLevel()
 {
     return this->level;
-}
-
-void PlayerSettings::setHealth(int amount)
-{
-    this->health += amount;
-}
-
-int PlayerSettings::getHealth()
-{
-    return this->health;
 }
 
 void PlayerSettings::increaseHighscore(int amount)

@@ -22,6 +22,8 @@ void Player::create(int maxAmmo, float firespeed)
     this->ammo = this->maxAmmo;
 
     this->firespeed = firespeed;
+
+    this->health = 3;
 }
 
 void Player::input(SDL_Event& e)
@@ -78,4 +80,49 @@ void Player::destroy()
 {
     SDL_DestroyTexture(this->texture);
     this->~Player();
+}
+
+void Player::setHealth(int amount)
+{
+    this->health += amount;
+}
+
+int Player::getHealth()
+{
+    return this->health;
+}
+
+void Player::setAmmo(int amount)
+{
+    this->ammo = amount;
+}
+
+void Player::increaseAmmo(int amount)
+{
+    this->ammo += amount;
+}
+
+int Player::getAmmo()
+{
+    return this->ammo;
+}
+
+void Player::increaseMaxAmmo()
+{
+    this->maxAmmo++;
+}
+
+int Player::getMaxAmmo()
+{
+    return this->maxAmmo;
+}
+
+void Player::increaseFirespeed()
+{
+    this->firespeed += .25f;
+}
+
+float Player::getFirespeed()
+{
+    return this->firespeed;
 }

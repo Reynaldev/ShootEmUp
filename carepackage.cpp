@@ -12,15 +12,52 @@ CarePackage::~CarePackage()
     this->texture = NULL;
 }
 
-void CarePackage::create(PackageType type)
+void CarePackage::create(SDL_Renderer* renderer, PackageType type)
 {
     this->packageType = type;
     this->speedY = 50.0f + (float)(rand() % 200);
+    this->setActive(true);
+
+    string texturePath;
+    switch (this->packageType)
+    {
+    case CP_HEALTH:
+        texturePath = "Src/Gfx/drop_health.png";
+        break;
+    case CP_AMMO:
+        texturePath = "Src/Gfx/drop_powerup.png";
+        break;
+    case CP_FIRESPEED:
+        texturePath = "Src/Gfx/drop_powerup.png";
+        break;
+    }
+
+    this->init(renderer, texturePath);
 }
 
 void CarePackage::move(float timeStep)
 {
     this->y += this->speedY * timeStep;
+}
+
+void CarePackage::get(Player &player)
+{
+    switch (this->packageType)
+    {
+    case CP_HEALTH:
+        // cout << "You got health" << endl;
+        player.setHealth(1 + (rand() & 3));
+        break;
+    case CP_AMMO:
+        // cout << "You got ammo" << endl;
+        player.increaseMaxAmmo();
+        player.increaseAmmo(1);
+        break;
+    case CP_FIRESPEED:
+        // cout << "You got firespeed upgrade" << endl;
+        player.increaseFirespeed();
+        break;
+    }
 }
 
 void CarePackage::destroy()

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "main.h"
 
 class PlayerSettings
@@ -5,7 +7,6 @@ class PlayerSettings
 private:
     string name;
     int level;
-    int health;
     int highscore; 
 public:
     ~PlayerSettings();
@@ -16,9 +17,6 @@ public:
 
     void increaseLevel(int amount);
     int getLevel();
-
-    void setHealth(int amount);
-    int getHealth();
 
     void increaseHighscore(int amount);
     int getHighscore();
