@@ -31,14 +31,14 @@ int main(int argc, char* argv[])
     playerPlane.x = (SCREEN_WIDTH - playerPlane.w) / 2;
     playerPlane.y = SCREEN_HEIGHT - playerPlane.h;
     playerPlane.create(1, 5.0f);
-    playerPlane.init(gWindow.renderer, "Src/Gfx/player.png");
+    playerPlane.init(gWindow.renderer, "assets/gfx/player.png");
 
     // Initialize enemy textures
     string enemyTextures[6];
     for (int i = 0; i < 6; i++)
     {
         int index = i + 1;
-        string filename = "Src/Gfx/enemy" + to_string(index) + ".png";
+        string filename = "assets/gfx/enemy" + to_string(index) + ".png";
         enemyTextures[i] = filename;
     }
 
@@ -66,25 +66,25 @@ int main(int argc, char* argv[])
     // Level text
     string levelText;
     Text levelTextUI;
-    levelTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    levelTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
 
     // Highscore text
     string higscoreText;
     Text highscoreTextUI;
-    highscoreTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    highscoreTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
 
     // Health text
     string healthText;
     Text healthTextUI;
-    healthTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    healthTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
 
     string ammoText;
     Text ammoTextUI;
-    ammoTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    ammoTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
     
     string enemiesText;
     Text enemiesTextUI;
-    enemiesTextUI.create(28, "Src/Fonts/Kenney_Pixel.ttf");
+    enemiesTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
 
     SDL_UpdateWindowSurface(gWindow.window);
 
@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
             bullet.w = 64;
             bullet.h = 64;
             bullet.speedY = -600.0f;
-            bullet.init(gWindow.renderer, "Src/Gfx/bullet.png");
+            bullet.init(gWindow.renderer, "assets/gfx/bullet.png");
 
             bulletPool.push_back(bullet);
         }
