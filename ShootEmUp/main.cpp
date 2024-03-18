@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
         gWindow.render();
 
         // Care Package
-        if (carePackages.size() > 0)
+        if (!carePackages.empty())
         {
             for (int i = 0; i < carePackages.size(); i++)
             {
@@ -131,8 +131,6 @@ int main(int argc, char* argv[])
                     // Remove the entity from the vector
                     carePackages[i].destroy();
                     carePackages.erase(carePackages.begin() + i);
-
-                    continue;
                 }
             }
         }
@@ -150,7 +148,7 @@ int main(int argc, char* argv[])
         }
 
         // Bullet render, logic, etc.
-        if (bullets.size() > 0)
+        if (!bullets.empty())
         {
             for (int i = 0; i < bullets.size(); i++)
             {
@@ -179,7 +177,7 @@ int main(int argc, char* argv[])
 
         // Check if there are no enemies
         // If there's no enemy, then we initialize them
-        if (enemies.size() <= 0)
+        if (enemies.empty())
         {
             player.increaseLevel(1);
             int enemyPerLevel = player.getLevel() * 2;
@@ -204,6 +202,8 @@ int main(int argc, char* argv[])
             // Render
             for (int i = 0; i < enemies.size(); i++)
             {
+                bool isDestroyed = false;
+
                 enemies[i].move(timeStep);
 
                 if (enemies[i].y > SCREEN_HEIGHT)
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 
                 enemies[i].render(gWindow.renderer, NULL, 180, NULL);
 
-                // Destroy if it's collide with player's bullet and erase it from the vector
+                // Destroy if it's collided with player's bullet and erase it from the vector
                 for (Bullet b : bullets)
                 {
                     if (enemies[i].collideWith(b.rect) && b.isActive())
@@ -235,8 +235,9 @@ int main(int argc, char* argv[])
 
                         // Remove from the vector
                         enemies[i].destroy();
-                        enemies.erase(enemies.begin() + i);
                         player.increaseHighscore(1);
+
+                        isDestroyed = true;
 
                         break;
                     }
@@ -250,10 +251,12 @@ int main(int argc, char* argv[])
 
                     // Remove from the vector
                     enemies[i].destroy();
-                    enemies.erase(enemies.begin() + i);
-
-                    continue;
+                    
+                    isDestroyed = true;
                 }
+
+                if (isDestroyed)
+                    enemies.erase(enemies.begin() + i);
             }
         }
 
