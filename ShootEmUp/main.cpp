@@ -93,8 +93,13 @@ int main(int argc, char* argv[])
     bool quit = false;
     while (!quit)
     {
+        static bool isDefeated = false;
+
         while (SDL_PollEvent(&e))
         {
+            if (isDefeated)
+                continue;
+
             if (e.type == SDL_QUIT)
                 quit = true;
 
@@ -106,6 +111,18 @@ int main(int argc, char* argv[])
 
         // Render the window
         gWindow.render();
+
+        if (isDefeated)
+        {
+            Text gameOverTextUI;
+            gameOverTextUI.create(32, "assets/fonts/Kenney_Pixel.ttf");
+            gameOverTextUI.display(gWindow.renderer, white, "Game Over");
+            gameOverTextUI.render(gWindow.renderer, (SCREEN_WIDTH - gameOverTextUI.w) / 2, (SCREEN_HEIGHT - gameOverTextUI.h) / 2);
+
+            SDL_RenderPresent(gWindow.renderer);
+            
+            continue;
+        }
 
         // Care Package
         if (!carePackages.empty())
@@ -283,6 +300,8 @@ int main(int argc, char* argv[])
         }
 
         // Player collision
+        if (playerPlane.getHealth() <= 0)
+            isDefeated = true;
 
         // Render player
         playerPlane.render(gWindow.renderer);
