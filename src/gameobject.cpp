@@ -2,6 +2,8 @@
 
 void GameObject::init(SDL_Renderer* renderer, string texturePath)
 {
+    this->enabled = true;
+
     this->texture = IMG_LoadTexture(renderer, texturePath.c_str());
     if (!this->texture)
     {

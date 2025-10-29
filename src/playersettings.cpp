@@ -38,3 +38,9 @@ int PlayerSettings::getHighscore()
 {
     return this->highscore;
 }
+
+void PlayerSettings::reset()
+{
+    this->highscore = 0;
+    this->level = 0;
+}

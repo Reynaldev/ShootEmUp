@@ -20,4 +20,6 @@ public:
 
     void increaseHighscore(int amount);
     int getHighscore();
+
+    void reset();
 };

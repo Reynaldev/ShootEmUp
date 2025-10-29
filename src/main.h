@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,3 +19,9 @@
 #endif // defined(__linux__)
 
 using namespace std;
+
+enum GAMESTATE {
+    GAME_OVER = -1,
+    GAME_INIT = 0,
+    GAME_LOOP = 1
+};

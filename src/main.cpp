@@ -7,9 +7,12 @@
 #include "playersettings.h"
 #include "timer.h"
 #include "carepackage.h"
+#include <SDL2/SDL_keycode.h>
 
 int main(int argc, char* argv[])
 {
+    GAMESTATE gamestate = GAME_INIT;
+
     // Set seed for RNG
     srand(time(NULL));
 
@@ -86,19 +89,47 @@ int main(int argc, char* argv[])
     Text enemiesTextUI;
     enemiesTextUI.create(28, "assets/fonts/Kenney_Pixel.ttf");
 
+    string gameoverText;
+    Text gameoverTextUI;
+    gameoverTextUI.create(48, "assets/fonts/Kenney_Pixel.ttf");
+
     SDL_UpdateWindowSurface(gWindow.window);
 
     // Loop
+    gamestate = GAME_LOOP;
+
     SDL_Event e;
     bool quit = false;
     while (!quit)
     {
         while (SDL_PollEvent(&e))
         {
-            if (e.type == SDL_QUIT)
+            if (e.type == SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE)
                 quit = true;
 
-            playerPlane.input(e);
+            if (gamestate == GAME_LOOP) {
+                playerPlane.input(e);
+            }
+
+            if (gamestate == GAME_OVER) {
+                if (e.key.keysym.sym == SDLK_r) {
+                    timer.stop();
+                    timer.start();
+
+                    playerPlane.destroy();
+
+                    playerPlane.w = 64;
+                    playerPlane.h = 64;
+                    playerPlane.x = (SCREEN_WIDTH - playerPlane.w) / 2;
+                    playerPlane.y = SCREEN_HEIGHT - playerPlane.h;
+                    playerPlane.create(1, 5.0f);
+                    playerPlane.init(gWindow.renderer, "assets/gfx/player.png");
+
+                    player.reset();
+
+                    gamestate = GAME_LOOP;
+                }
+            }
         }
 
         // Calculate timestep
@@ -107,182 +138,186 @@ int main(int argc, char* argv[])
         // Render the window
         gWindow.render();
 
-        // Care Package
-        if (!carePackages.empty())
-        {
-            for (int i = 0; i < carePackages.size(); i++)
-            {
-                carePackages[i].move(timeStep);
-                carePackages[i].render(gWindow.renderer);
-
-                // Destroy the package if it's outside the window
-                if (carePackages[i].y > SCREEN_WIDTH)
-                {
-                    carePackages[i].destroy();
-                    carePackages.erase(carePackages.begin() + i);
-                }
-
-                // Collision
-                if (carePackages[i].collideWith(playerPlane.rect) && playerPlane.isActive())
-                {
-                    // Implement upgrade
-                    carePackages[i].get(playerPlane);
-                    
-                    // Remove the entity from the vector
-                    carePackages[i].destroy();
-                    carePackages.erase(carePackages.begin() + i);
-                }
-            }
+        if (playerPlane.getHealth() <= 0) {
+            gamestate = GAME_OVER;
         }
-
-        // Bullets
-        while (bulletPool.size() < playerPlane.getAmmo())
-        {
-            Bullet bullet;
-            bullet.w = 64;
-            bullet.h = 64;
-            bullet.speedY = -600.0f;
-            bullet.init(gWindow.renderer, "assets/gfx/bullet.png");
-
-            bulletPool.push_back(bullet);
-        }
-
-        // Bullet render, logic, etc.
-        if (!bullets.empty())
-        {
-            for (int i = 0; i < bullets.size(); i++)
+        
+        if (gamestate == GAME_LOOP) {
+            // Care Package
+            if (!carePackages.empty())
             {
-                bullets[i].move(timeStep);
-                
-                // Only render the bullet if it's inside the window
-                if (bullets[i].y > (0 - bullets[i].h))
+                for (int i = 0; i < carePackages.size(); i++)
                 {
-                    bullets[i].render(gWindow.renderer);
-                }
-                else 
-                {
-                    // Disable  the bullet
-                    bullets[i].setActive(false);
+                    carePackages[i].move(timeStep);
+                    carePackages[i].render(gWindow.renderer);
 
-                    // Remove it and store it to bulletPool vector
-                    bulletPool.push_back(bullets[i]);
-                    bullets.erase(bullets.begin() + i);
-
-                    // Increase the ammo if it's less than the maximum ammo
-                    if (playerPlane.getAmmo() < playerPlane.getMaxAmmo())
-                        playerPlane.increaseAmmo(1);
-                }
-            }
-        }
-
-        // Check if there are no enemies
-        // If there's no enemy, then we initialize them
-        if (enemies.empty())
-        {
-            player.increaseLevel(1);
-            int enemyPerLevel = player.getLevel() * 2;
-
-            for (int i = 0; i < enemyPerLevel; i++)
-            {
-                Enemy enemy;
-                enemy.w = 64;
-                enemy.h = 64;
-                enemy.x = abs((float)(rand() % SCREEN_WIDTH) - enemy.w);
-                enemy.y = 0 - enemy.h;
-
-                enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
-                enemy.create(100.0f + float(rand() % 201), abs(rand() % 10 - 6 + player.getLevel()));
-
-                enemies.push_back(enemy);
-            }
-        }
-        else
-        {
-            // Execute the enemies if there are
-            // Render
-            for (int i = 0; i < enemies.size(); i++)
-            {
-                bool isDestroyed = false;
-
-                enemies[i].move(timeStep);
-
-                if (enemies[i].y > SCREEN_HEIGHT)
-                {
-                    enemies[i].y = 0 - enemies[i].h;
-                    enemies[i].x = abs(rand() % SCREEN_WIDTH - enemies[i].w);
-                    enemies[i].speedY = 100.0f + float(rand() % 201);
-                }
-
-                enemies[i].render(gWindow.renderer, NULL, 180, NULL);
-
-                // Destroy if it's collided with player's bullet and erase it from the vector
-                for (Bullet b : bullets)
-                {
-                    if (enemies[i].collideWith(b.rect) && b.isActive())
+                    // Destroy the package if it's outside the window
+                    if (carePackages[i].y > SCREEN_WIDTH)
                     {
-                        // Care package
-                        bool spawnPackage = (rand() % 15 == 0) ? true : false;
-                        if (spawnPackage)
+                        carePackages[i].destroy();
+                        carePackages.erase(carePackages.begin() + i);
+                    }
+
+                    // Collision
+                    if (carePackages[i].collideWith(playerPlane.rect) && playerPlane.isActive())
+                    {
+                        // Implement upgrade
+                        carePackages[i].get(playerPlane);
+                        
+                        // Remove the entity from the vector
+                        carePackages[i].destroy();
+                        carePackages.erase(carePackages.begin() + i);
+                    }
+                }
+            }
+
+            // Bullets
+            while (bulletPool.size() < playerPlane.getAmmo())
+            {
+                Bullet bullet;
+                bullet.w = 64;
+                bullet.h = 64;
+                bullet.speedY = -600.0f;
+                bullet.init(gWindow.renderer, "assets/gfx/bullet.png");
+
+                bulletPool.push_back(bullet);
+            }
+
+            // Bullet render, logic, etc.
+            if (!bullets.empty())
+            {
+                for (int i = 0; i < bullets.size(); i++)
+                {
+                    bullets[i].move(timeStep);
+                    
+                    // Only render the bullet if it's inside the window
+                    if (bullets[i].y > (0 - bullets[i].h))
+                    {
+                        bullets[i].render(gWindow.renderer);
+                    }
+                    else 
+                    {
+                        // Disable  the bullet
+                        bullets[i].setActive(false);
+
+                        // Remove it and store it to bulletPool vector
+                        bulletPool.push_back(bullets[i]);
+                        bullets.erase(bullets.begin() + i);
+
+                        // Increase the ammo if it's less than the maximum ammo
+                        if (playerPlane.getAmmo() < playerPlane.getMaxAmmo())
+                            playerPlane.increaseAmmo(1);
+                    }
+                }
+            }
+
+            // Check if there are no enemies
+            // If there's no enemy, then we initialize them
+            if (enemies.empty())
+            {
+                player.increaseLevel(1);
+                int enemyPerLevel = player.getLevel() * 2;
+
+                for (int i = 0; i < enemyPerLevel; i++)
+                {
+                    Enemy enemy;
+                    enemy.w = 64;
+                    enemy.h = 64;
+                    enemy.x = abs((float)(rand() % SCREEN_WIDTH) - enemy.w);
+                    enemy.y = 0 - enemy.h;
+
+                    enemy.init(gWindow.renderer, enemyTextures[rand() % 6]);
+                    enemy.create(100.0f + float(rand() % 201), abs(rand() % 10 - 6 + player.getLevel()));
+
+                    enemies.push_back(enemy);
+                }
+            }
+            else
+            {
+                // Execute the enemies if there are
+                // Render
+                for (int i = 0; i < enemies.size(); i++)
+                {
+                    bool isDestroyed = false;
+
+                    enemies[i].move(timeStep);
+
+                    if (enemies[i].y > SCREEN_HEIGHT)
+                    {
+                        enemies[i].y = 0 - enemies[i].h;
+                        enemies[i].x = abs(rand() % SCREEN_WIDTH - enemies[i].w);
+                        enemies[i].speedY = 100.0f + float(rand() % 201);
+                    }
+
+                    enemies[i].render(gWindow.renderer, NULL, 180, NULL);
+
+                    // Destroy if it's collided with player's bullet and erase it from the vector
+                    for (Bullet b : bullets)
+                    {
+                        if (enemies[i].collideWith(b.rect) && b.isActive())
                         {
-                            CarePackage cp;
-                            cp.w = 64;
-                            cp.h = 64;
-                            cp.x = enemies[i].x;
-                            cp.y = enemies[i].y;
-                            cp.create(gWindow.renderer, carePackageType[rand() % 3]);
-                            carePackages.push_back(cp);
+                            // Care package
+                            bool spawnPackage = (rand() % 15 == 0) ? true : false;
+                            if (spawnPackage)
+                            {
+                                CarePackage cp;
+                                cp.w = 64;
+                                cp.h = 64;
+                                cp.x = enemies[i].x;
+                                cp.y = enemies[i].y;
+                                cp.create(gWindow.renderer, carePackageType[rand() % 3]);
+                                carePackages.push_back(cp);
+                            }
+
+                            // Remove from the vector
+                            enemies[i].destroy();
+                            player.increaseHighscore(1);
+
+                            isDestroyed = true;
+
+                            break;
                         }
+                    }
+
+                    // Detect collision with player
+                    if (enemies[i].collideWith(playerPlane.rect) && playerPlane.isActive())
+                    {
+                        // Decrease player health
+                        playerPlane.setHealth(-1);
 
                         // Remove from the vector
                         enemies[i].destroy();
-                        player.increaseHighscore(1);
-
+                        
                         isDestroyed = true;
-
-                        break;
                     }
+
+                    if (isDestroyed)
+                        enemies.erase(enemies.begin() + i);
                 }
+            }
 
-                // Detect collision with player
-                if (enemies[i].collideWith(playerPlane.rect) && playerPlane.isActive())
-                {
-                    // Decrease player health
-                    playerPlane.setHealth(-1);
+            // Move player
+            playerPlane.move(timeStep);
+            
+            if (SDL_GetTicks() >= playerPlane.nextFirespeed)
+            {
+                playerPlane.shoot(bulletPool, bullets);
+                playerPlane.nextFirespeed = SDL_GetTicks() + 1000.0f / playerPlane.firespeed;
+            }
 
-                    // Remove from the vector
-                    enemies[i].destroy();
-                    
-                    isDestroyed = true;
-                }
+            // Restart timer
+            timer.start();
 
-                if (isDestroyed)
-                    enemies.erase(enemies.begin() + i);
+            // Render the player and check if it's out of the window's width
+            if (playerPlane.x > SCREEN_WIDTH)
+            {
+                playerPlane.x = 0 - playerPlane.w;
+            }
+            else if (playerPlane.x < 0 - playerPlane.w)
+            {
+                playerPlane.x = SCREEN_WIDTH;
             }
         }
-
-        // Move player
-        playerPlane.move(timeStep);
-        
-        if (SDL_GetTicks() >= playerPlane.nextFirespeed)
-        {
-            playerPlane.shoot(bulletPool, bullets);
-            playerPlane.nextFirespeed = SDL_GetTicks() + 1000.0f / playerPlane.firespeed;
-        }
-
-        // Restart timer
-        timer.start();
-
-        // Render the player and check if it's out of the window's width
-        if (playerPlane.x > SCREEN_WIDTH)
-        {
-            playerPlane.x = 0 - playerPlane.w;
-        }
-        else if (playerPlane.x < 0 - playerPlane.w)
-        {
-            playerPlane.x = SCREEN_WIDTH;
-        }
-
-        // Player collision
 
         // Render player
         playerPlane.render(gWindow.renderer);
@@ -310,6 +345,12 @@ int main(int argc, char* argv[])
         healthTextUI.render(gWindow.renderer, SCREEN_WIDTH - healthTextUI.w, SCREEN_HEIGHT - healthTextUI.h);
         ammoTextUI.render(gWindow.renderer, 0, 0);
         enemiesTextUI.render(gWindow.renderer, SCREEN_WIDTH - enemiesTextUI.w, 0);
+
+        if (gamestate == GAME_OVER) {
+            gameoverText = "Game Over";
+            gameoverTextUI.display(gWindow.renderer, white, gameoverText);
+            gameoverTextUI.render(gWindow.renderer, (SCREEN_WIDTH - gameoverTextUI.w) / 2, (SCREEN_HEIGHT - gameoverTextUI.h) / 2);
+        }
 
         SDL_RenderPresent(gWindow.renderer);
     }

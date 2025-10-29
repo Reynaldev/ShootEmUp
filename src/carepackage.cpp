@@ -22,13 +22,13 @@ void CarePackage::create(SDL_Renderer* renderer, PackageType type)
     switch (this->packageType)
     {
     case CP_HEALTH:
-        texturePath = "gfx/drop_health.png";
+        texturePath = "assets/gfx/drop_health.png";
         break;
     case CP_AMMO:
-        texturePath = "gfx/drop_powerup.png";
+        texturePath = "assets/gfx/drop_powerup.png";
         break;
     case CP_FIRESPEED:
-        texturePath = "gfx/drop_powerup.png";
+        texturePath = "assets/gfx/drop_powerup.png";
         break;
     }
 
