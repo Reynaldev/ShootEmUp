@@ -298,7 +298,7 @@ int main(int argc, char* argv[])
         healthText = "Health: " + to_string(playerPlane.getHealth());
         healthTextUI.display(gWindow.renderer, white, healthText);
 
-        ammoText = "Ammo: " + to_string(playerPlane.getAmmo()) + " | " + to_string(playerPlane.getMaxAmmo());
+        ammoText = "Ammo: " + to_string(playerPlane.getAmmo()) + " / " + to_string(playerPlane.getMaxAmmo());
         ammoTextUI.display(gWindow.renderer, white, ammoText);
 
         enemiesText = "Enemies left: " + to_string(enemies.size());
